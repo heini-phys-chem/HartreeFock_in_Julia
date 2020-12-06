@@ -30,10 +30,10 @@ function gaussian_product(A, B)
   b, Rb = B
   p = a + b
 
-  diff = abs2(Ra-Rb)                # squared diff of the two centers
+  diff = abs2(Ra-Rb)            # squared diff of the two centers
   N    = (4*a*b/(pi^2))*0.75    # normalisation
-  K    = N*exp(-a*b/p*diff)         # new prefactor
-  Rp   = (a*Ra + b*Rb)/p            # new center
+  K    = N*exp(-a*b/p*diff)     # new prefactor
+  Rp   = (a*Ra + b*Rb)/p        # new center
 
   return p, diff, K, Rp
 end
@@ -90,7 +90,7 @@ function multi(A, B, C, D)
 end
 
 ########################################################################################################################
-# MAIN
+# Some book keeping 
 ########################################################################################################################
 
 
@@ -130,6 +130,14 @@ alpha = [ [0.109818, 0.450771, 2.22766]
 
 # Basis set size TODO: add loop B+=max_quantum_numer[atom] for atom in atoms
 B = 0
+println("B = $B")
+
+for atom in atom_type
+  global B += max_quantum_number[atom]
+  println(atom)
+end
+
+println("New B = $B")
 
 # Number of electrons
 N = 2
@@ -138,3 +146,25 @@ N = 2
 charge_dict = Dict("H" => 1, "C" => 6)
 
 
+########################################################################################################################
+# MAIN
+########################################################################################################################
+
+# Initailize matrices
+S = zeros(Float64, B, B)
+T = zeros(Float64, B, B)
+V = zeros(Float64, B, B)
+
+multi_electron_tensor = zeros(Float64, B, B, B, B)
+
+# Iterate through atoms
+for (idx_a, val_a) in enumerate(atom_type)
+  Za = charge_dict[val_a]
+  Ra = atom_coordinates[idx_a]
+
+  # Iterate through quantum numbers (1s, 2s, etc.)
+  for m in 0:max_quantum_number[val_a]
+    println(m)
+  end
+
+end
