@@ -1,5 +1,8 @@
 include("/home/heinen/workcopies/HartreeFock_in_Julia/functions.jl")
 include("/home/heinen/workcopies/HartreeFock_in_Julia/book_keeping.jl")
+include("/home/heinen/workcopies/HartreeFock_in_Julia/computing_integrals.jl")
+
+using LinearAlgebra
 
 
 global pi = 3.14159
@@ -16,11 +19,9 @@ println("Coordinates: $atom_coordinates")
 
 
 B = 0
-println("B = $B")
 
 for atom in atom_type
   global B += max_quantum_number[atom]
-  println(atom)
 end
 
 println("New B = $B")
@@ -43,13 +44,33 @@ V = zeros(Float64, B, B)
 
 multi_electron_tensor = zeros(Float64, B, B, B, B)
 
-# Iterate through atoms
-for (idx_a, val_a) in enumerate(atom_type)
-  Za = charge_dict[val_a]
-  Ra = atom_coordinates[idx_a]
+S, T, V, multi_electron_tensor = compute_integrals(S, T, V, multi_electron_tensor)
 
-  # Iterate through quantum numbers (1s, 2s, etc.)
-  for m in 0:max_quantum_number[val_a]
-    println("Quantum number m: $m")
-  end
-end
+println("S: $S")
+println("T: $T")
+println("V: $V")
+println("multi elec: $multi_electron_tensor")
+
+Hcore = T + V
+println("\nHcore: $Hcore")
+
+# Symmetric Orthogonalisation of basis (p144)
+evalS = eigvals(S)
+U = eigvecs(S)
+println("\nevalsS: $evalS\nU: $U")
+
+#println("SU: ", dot(S, U))
+#SU = zeros(Float64, 1, 1)
+#SU[1] = dot(S[1], U[1])
+#SU[2] = dot(S[2], U[2])
+#
+#println("SU: $SU")
+#
+#
+#diagS = dot(U, SU)
+#println("diagS: $diagS")
+
+
+
+
+

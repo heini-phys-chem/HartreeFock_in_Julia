@@ -1,3 +1,6 @@
+using LinearAlgebra
+using SpecialFunctions
+
 # Reading in xyz file
 function read_xyz(f)
 
@@ -27,7 +30,7 @@ function gaussian_product(A, B)
   b, Rb = B
   p = a + b
 
-  diff = abs2(Ra-Rb)            # squared diff of the two centers
+  diff = norm(Ra-Rb)            # squared diff of the two centers
   N    = (4*a*b/(pi^2))*0.75    # normalisation
   K    = N*exp(-a*b/p*diff)     # new prefactor
   Rp   = (a*Ra + b*Rb)/p        # new center
@@ -39,7 +42,7 @@ end
 # Overlapp integral (p411)
 function overlap(A, B)
   p, diff, K, Rp = gaussian_product(A, B)
-  predactor = (pi/p)^1.5
+  prefactor = (pi/p)^1.5
 
   return prefactor*K
 end
@@ -71,9 +74,9 @@ end
 function potential(A, B, atom_idx)
   p, diff, K, Rp = gaussian_product(A, B)
   Rc = atom_coordinates[atom_idx]
-  Zc = charge_dict[atoms[atom_idx]]
+  Zc = charge_dict[atom_type[atom_idx]]
 
-  return (-2*pi*Zc/p)*K*F0(p*abs2(Rp-Rc))
+  return (-2*pi*Zc/p)*K*F0(p*norm(Rp-Rc))
 end
 
 # (ab|cd) integral (p413)
@@ -83,6 +86,6 @@ function multi(A, B, C, D)
 
   multi_prefactor = 2*pi^2.5*(p*q*(p+q)^0.5)^-1
 
-  return multi_prefactor*K_ab*K_cd*F0(p*q/(p+q)*abs2(Rp-Rq))
+  return multi_prefactor*K_ab*K_cd*F0(p*q/(p+q)*norm(Rp-Rq))
 end
 
