@@ -30,8 +30,8 @@ function gaussian_product(A, B)
   b, Rb = B
   p = a + b
 
-  diff = norm(Ra-Rb)            # squared diff of the two centers
-  N    = (4*a*b/(pi^2))*0.75    # normalisation
+  diff = norm(Ra-Rb)^2          # squared diff of the two centers
+  N    = (4*a*b/(pi^2))^0.75    # normalisation
   K    = N*exp(-a*b/p*diff)     # new prefactor
   Rp   = (a*Ra + b*Rb)/p        # new center
 
@@ -76,7 +76,7 @@ function potential(A, B, atom_idx)
   Rc = atom_coordinates[atom_idx]
   Zc = charge_dict[atom_type[atom_idx]]
 
-  return (-2*pi*Zc/p)*K*F0(p*norm(Rp-Rc))
+  return (-2*pi*Zc/p)*K*F0(p*norm(Rp-Rc)^2)
 end
 
 # (ab|cd) integral (p413)
@@ -86,6 +86,29 @@ function multi(A, B, C, D)
 
   multi_prefactor = 2*pi^2.5*(p*q*(p+q)^0.5)^-1
 
-  return multi_prefactor*K_ab*K_cd*F0(p*q/(p+q)*norm(Rp-Rq))
+  return multi_prefactor*K_ab*K_cd*F0(p*q/(p+q)*norm(Rp-Rq)^2)
 end
 
+# check difference of two most recent guesses of the density matrix
+function SD_successive_density_matrix_elements(Ptilde, P, B)
+  x = 0
+
+  for i in 1:B
+    for j in 1:B
+      x += B^-2*( Ptilde[i,j] - P[i,j])^2
+    end
+  end
+
+  return x^0.5
+end
+
+# Multiply 0.5 to diagonal of a matrix M
+function add_diag(M)
+  diag_idx = diagind(M)
+
+  for i in diag_idx
+    M[i] = M[i]^-0.5
+  end
+
+  return M
+end

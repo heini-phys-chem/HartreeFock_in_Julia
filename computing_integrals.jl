@@ -1,8 +1,12 @@
 include("/home/heinen/workcopies/HartreeFock_in_Julia/functions.jl")
 include("/home/heinen/workcopies/HartreeFock_in_Julia/book_keeping.jl")
 
+using ProgressBars
+
 function compute_integrals(S, T, V, multi_electron_tensor)
   # Iterate through atoms
+  println("\n[-] Calculating integrals")
+  #for (idx_a, val_a) in tqdm(enumerate(atom_type))
   for (idx_a, val_a) in enumerate(atom_type)
     Za = charge_dict[val_a]
     Ra = atom_coordinates[idx_a]
@@ -31,7 +35,7 @@ function compute_integrals(S, T, V, multi_electron_tensor)
               b = (idx_b)*(n)
   
               # Generate the overlap, kinetic and potential matrices
-              S[a,b] += d_vec_m[numAtoms]*d_vec_n[q]*overlap((alpha_vec_m[p], Ra), (alpha_vec_n[q], Rb))
+              S[a,b] += d_vec_m[p]*d_vec_n[q]*overlap((alpha_vec_m[p], Ra), (alpha_vec_n[q], Rb))
               T[a,b] += d_vec_m[p]*d_vec_n[q]*kinetic((alpha_vec_m[p], Ra), (alpha_vec_n[q], Rb))
   
               for i in 1:numAtoms
@@ -79,6 +83,7 @@ function compute_integrals(S, T, V, multi_electron_tensor)
       end
     end
   end
+  println("[+] Calculating integrals\n")
 
   return S, T, V, multi_electron_tensor
 
